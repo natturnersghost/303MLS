@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from datetime import time
+from pydantic import BaseModel, EmailStr
+from datetime import time, date
 from typing import Optional
 
 
@@ -13,6 +13,7 @@ print("hello, world")
 class Job(BaseModel):
 
     location: str
+    date: date
     starttime: time
     stoptime: time
     travel: float
@@ -24,14 +25,6 @@ class Job(BaseModel):
     other: bool = False
     fullService: bool = False
 
-    def bill(starttime, stoptime, rate, travel: Optional[int] = 0,  mileage: Optional[int] = 0):
-        st = time_to_int(starttime)
-        stp = time_to_int(stoptime)
-        job_time = (stp - st) + travel
-        fuel = mileage * .25
-        total = job_time * rate + fuel
-        return total
-
 
     
 
@@ -40,9 +33,10 @@ class Job(BaseModel):
         orm_mode = True
 
 
-class UserDisplay(BaseModel):
+class JobDisplay(BaseModel):
     id: int
     location: str
+    date: date
     starttime: time
     stoptime: time
     travel: float
@@ -57,6 +51,17 @@ class UserDisplay(BaseModel):
         # converts databse data into user display data ie DBUser to UserDisplay
 
 
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+class UserDisplay(BaseModel):
+    username: str
+    email: EmailStr
+    id: int
+    class Config():
+        orm_mode = True 
 
 def time_to_int(t: time) -> int:
     return t.hour + t.minute / 60 + t.second / 3600
