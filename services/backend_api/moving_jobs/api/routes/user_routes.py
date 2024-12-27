@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from db.mlsdb import get_db
 from db import db_user
-from schemas import UserBase, UserDisplay
+from api.schemas.schemas import UserBase, UserDisplay
 
 router = APIRouter(
     tags=['Users']

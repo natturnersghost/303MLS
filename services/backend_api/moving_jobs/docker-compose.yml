@@ -7,4 +7,20 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+    environment:
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - SQLALCHEMY_DATABASE_URL=sqlite:///./mls.db
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://fastapi-app:8000
+    depends_on:
+      - fastapi-app
 

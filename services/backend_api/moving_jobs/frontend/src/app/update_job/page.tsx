@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface Job {
@@ -19,7 +19,9 @@ interface Job {
   other: boolean;
 }
 
-export default function UpdateJob() {
+// Move your main component logic into UpdateJobContent
+function UpdateJobContent() {
+  // const _router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get('id');
   
@@ -41,13 +43,7 @@ export default function UpdateJob() {
 
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    if (jobId) {
-      fetchJob();
-    }
-  }, [jobId]);
-
-  const fetchJob = async () => {
+  const fetchJob = useCallback(async () => {
     try {
       const response = await fetch(`http://localhost:8000/job/${jobId}`);
       if (response.ok) {
@@ -61,9 +57,16 @@ export default function UpdateJob() {
         setMessage('Failed to fetch job details');
       }
     } catch (error) {
+      console.error('Error fetching job:', error);
       setMessage('Error fetching job details');
     }
-  };
+  }, [jobId]);
+
+  useEffect(() => {
+    if (jobId) {
+      fetchJob();
+    }
+  }, [jobId, fetchJob]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +93,7 @@ export default function UpdateJob() {
         setMessage(`Failed to update job: ${errorData.detail || 'Unknown error'}`);
       }
     } catch (error) {
+      console.error('Error updating job:', error);
       setMessage('Error updating job');
     }
   };
@@ -244,5 +248,14 @@ export default function UpdateJob() {
         </div>
       </form>
     </div>
+  );
+}
+
+// Wrap with Suspense in the default export
+export default function UpdateJob() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UpdateJobContent />
+    </Suspense>
   );
 }

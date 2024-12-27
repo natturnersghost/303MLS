@@ -42,6 +42,7 @@ export default function HomePage() {
         (e.target as HTMLFormElement).reset();
       }
     } catch (error) {
+      console.error('Failed to send message:', error);
       alert('Failed to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -195,7 +196,13 @@ export default function HomePage() {
                   <textarea id="message" name="message" rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"></textarea>
                 </div>
                 <div>
-                  <Button type="submit" className="w-full">Send Message</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                  </Button>
                 </div>
               </form>
             </div>

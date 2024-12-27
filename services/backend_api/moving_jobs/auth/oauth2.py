@@ -1,6 +1,6 @@
 from fastapi.security import OAuth2PasswordBearer
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="sign_in")
 
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
@@ -10,7 +10,7 @@ from decouple import config
 
  
  
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign_in")
 
 SECRET_KEY = config('SECRET_KEY')
 ALGORITHM = config('ALGORITHM')

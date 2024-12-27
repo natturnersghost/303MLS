@@ -1,6 +1,6 @@
 from passlib.context import CryptContext 
 # this encrypts password
-password_context = CryptContext(schemes='bcrypt', deprecated='auto')
+password_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 class Hash():
     def bcrypt(password: str):

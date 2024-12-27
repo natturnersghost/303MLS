@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface UserUpdateForm {
@@ -9,7 +9,7 @@ interface UserUpdateForm {
   password: string;
 }
 
-export default function UpdateUser() {
+function UpdateUserContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id');
@@ -40,7 +40,8 @@ export default function UpdateUser() {
         });
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
+        console.error('Error fetching user:', err);
         setError('Failed to fetch user data');
         setLoading(false);
       });
@@ -62,6 +63,7 @@ export default function UpdateUser() {
 
       router.push('/employee_dashboard'); 
     } catch (err) {
+      console.error('Error updating user:', err);
       setError('Failed to update user');
     }
   };
@@ -115,5 +117,13 @@ export default function UpdateUser() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function UpdateUser() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UpdateUserContent />
+    </Suspense>
   );
 }

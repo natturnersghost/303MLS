@@ -1,7 +1,7 @@
 from db.hash import Hash
 from sqlalchemy.orm import Session
-from schemas import UserBase
-from models import DBUser
+from api.schemas.schemas import UserBase
+from api.models.models import DBUser
 
 
 # Session is the thing that connects to the database and actually moves the data

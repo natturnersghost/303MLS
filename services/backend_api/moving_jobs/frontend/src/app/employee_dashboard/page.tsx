@@ -17,15 +17,22 @@ const dmSerifText = DM_Serif_Text({
   style: ['normal', 'italic'],
 })
 
+type ApiResponse = {
+  success?: boolean
+  error?: string
+  data?: unknown
+  // Add other possible response fields
+}
+
 export default function EmployeeDashboard() {
   const router = useRouter()
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<ApiResponse | null>(null)
   const [userId, setUserId] = useState('')
   const [jobId, setJobId] = useState('')
 
   const baseUrl = 'http://localhost:8000' // Adjust this to your API URL
 
-  const handleRequest = async (endpoint: string, method: string, body?: any) => {
+  const handleRequest = async (endpoint: string, method: string, body?: Record<string, unknown>) => {
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
@@ -37,9 +44,10 @@ export default function EmployeeDashboard() {
         body: body ? JSON.stringify(body) : undefined,
       })
       
-      const data = await response.json()
+      const data: ApiResponse = await response.json()
       setResult(data)
     } catch (error) {
+      console.error('Request failed:', error)  // Log the error
       setResult({ error: 'Request failed' })
     }
   }
@@ -64,6 +72,7 @@ export default function EmployeeDashboard() {
       const data = await response.json()
       setResult(data)
     } catch (error) {
+      console.error(`Failed to delete ${type}:`, error)  // Log the error
       setResult({ error: `Failed to delete ${type}` })
     }
   }

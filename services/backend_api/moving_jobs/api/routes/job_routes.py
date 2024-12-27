@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db.mlsdb import get_db
 from auth.oauth2 import oauth2_scheme
 from ..repositories import job_repository
-import schemas
+from ..schemas import schemas
 
 router = APIRouter()
 

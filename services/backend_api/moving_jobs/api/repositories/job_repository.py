@@ -4,6 +4,7 @@ from datetime import datetime
 import math
 
 from ..models.models import DBJob, JobCounter
+from ..schemas.schemas import Job
 from .. import schemas, exceptions
 
 def get_job_count(db: Session) -> int:
@@ -26,7 +27,7 @@ def generate_id(count: int) -> int:
     id = f'{today}-{count}'.replace('-', '')
     return int(id)
 
-def add_new_job(db: Session, request: schemas.Job) -> DBJob:
+def add_new_job(db: Session, request: Job) -> DBJob:
     job_count = get_job_count(db)
     new_job_id = generate_id(job_count)
     increment_job_count(db)
@@ -73,7 +74,7 @@ def get_job(db: Session, id: str) -> DBJob:
         )
     return job
 
-def update_job(db: Session, id: str, request: schemas.Job) -> DBJob:
+def update_job(db: Session, id: str, request: Job) -> DBJob:
     job = db.query(DBJob).filter(DBJob.id == id).first()
     if job:
         for key, value in request.dict().items():
