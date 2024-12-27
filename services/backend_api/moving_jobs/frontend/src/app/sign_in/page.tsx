@@ -30,7 +30,7 @@ export default function TokenForm() {
     setTokenInfo(null)
 
     try {
-      const response = await fetch('http://localhost:8000/sign_in', {
+      const response = await fetch('/sign_in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -39,22 +39,24 @@ export default function TokenForm() {
           username,
           password,
           grant_type: 'password',
-        }),
+        }).toString(),
+        credentials: 'include',
       })
 
-      const data = await response.json()
-      
       if (!response.ok) {
-        throw new Error(data.detail || 'Invalid credentials')
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to sign in');
       }
 
-      setTokenInfo(data)
+      const data = await response.json();
+      setTokenInfo(data);
       login(data.access_token, data)
       router.push('/employee_dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Sign in error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
