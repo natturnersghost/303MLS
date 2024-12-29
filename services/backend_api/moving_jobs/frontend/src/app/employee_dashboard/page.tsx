@@ -47,8 +47,11 @@ export default function EmployeeDashboard() {
       const data: ApiResponse = await response.json()
       setResult(data)
     } catch (error) {
-      console.error('Request failed:', error)  // Log the error
-      setResult({ error: 'Request failed' })
+      console.error('Request failed with error:', error);
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        console.error('This might be a network or CORS issue.');
+      }
+      setResult({ error: 'Request failed' });
     }
   }
 

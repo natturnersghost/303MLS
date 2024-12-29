@@ -30,33 +30,53 @@ export default function TokenForm() {
     setTokenInfo(null)
 
     try {
-      const response = await fetch('/sign_in', {
+      const formData = new URLSearchParams()
+      formData.append('username', username)
+      formData.append('password', password)
+      formData.append('grant_type', 'password')
+
+      // Use the environment variable for the API URL
+      const requestUrl = `${process.env.NEXT_PUBLIC_API_URL}/sign_in`
+      console.log('Making request to:', requestUrl)
+      console.log('Request body:', formData.toString())
+
+      const response = await fetch(requestUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
         },
-        body: new URLSearchParams({
-          username,
-          password,
-          grant_type: 'password',
-        }).toString(),
+        body: formData.toString(),
         credentials: 'include',
       })
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to sign in');
+      // Log response details
+      console.log('Response status:', response.status)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+      
+      const text = await response.text()
+      console.log('Raw response:', text)
+
+      // Check if we got HTML instead of JSON
+      if (text.includes('<!DOCTYPE html>')) {
+        console.error('Received HTML instead of JSON')
+        throw new Error('Server returned HTML instead of JSON. The request might be going to the wrong endpoint.')
       }
 
-      const data = await response.json();
-      setTokenInfo(data);
-      login(data.access_token, data)
-      router.push('/employee_dashboard')
+      try {
+        const data = JSON.parse(text)
+        setTokenInfo(data)
+        login(data.access_token, data)
+        router.push('/employee_dashboard')
+      } catch (parseError) {
+        console.error('Failed to parse JSON:', text)
+        throw new Error('Invalid JSON response from server')
+      }
     } catch (err) {
-      console.error('Sign in error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Sign in error:', err)
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 

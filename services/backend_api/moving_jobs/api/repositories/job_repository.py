@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from datetime import datetime
+from datetime import datetime, time
 import math
 
 from ..models.models import DBJob, JobCounter
@@ -89,3 +89,30 @@ def delete_job(db: Session, id: str) -> DBJob:
         db.delete(job)
         db.commit()
     return job
+
+def time_to_int(t: time) -> int:
+    time = t.hour + t.minute / 60 + t.second / 3600
+    return math.ceil(time * 4) / 4
+    
+def bills(job: DBJob):
+    if job is None:
+        raise ValueError("The job parameter cannot be None")
+    
+    st = time_to_int(job.starttime)
+    stp = time_to_int(job.stoptime)
+    job_time = (stp - st) + job.travel
+    if job.loadSwap and job.mileage < 40:
+        fuel = 10
+    else:    
+        fuel = job.mileage * .25
+    total1 = job_time * job.rate + fuel
+    total = f'{job.location}: {job_time}H * {job.rate} + {fuel} = {total1}'
+    response = {
+        'total': total1,
+        'job_time': job_time,
+        'job_location': job.location,
+        'hourly_rate': job.rate,
+        'formated_total': total
+       
+    }
+    return response
