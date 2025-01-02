@@ -17,7 +17,7 @@ def get_all_jobs(db: Session = Depends(get_db), token: str = Depends(oauth2_sche
     return job_repository.get_all_jobs(db)
 
 @router.get('/job/{id}', response_model=schemas.JobDisplay)
-def get_job(id: str, db: Session = Depends(get_db)):
+def get_job(id: str, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     job = job_repository.get_job(db, id)
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
@@ -26,14 +26,14 @@ def get_job(id: str, db: Session = Depends(get_db)):
         return job
 
 @router.get('/job/{id}/bill')
-def bill_job(id: int, db: Session = Depends(get_db)):
+def bill_job(id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     job = job_repository.get_job(db, id)
     return job_repository.bills(job)
 
 @router.put('/job/{id}/update')
-def update_job(id: int, request: schemas.Job, db: Session = Depends(get_db)):
+def update_job(id: int, request: schemas.Job, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     return job_repository.update_job(db, id, request)
 
 @router.delete('/job/{id}/delete')
-def delete_job(id: int, db: Session = Depends(get_db)):
+def delete_job(id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     return job_repository.delete_job(db, id)
