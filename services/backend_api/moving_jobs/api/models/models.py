@@ -1,7 +1,7 @@
+from db.mlsdb import Base
 from sqlalchemy import Column, Integer, Boolean, String, Date, Float, Time
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+
 
 class DBUser(Base):
     __tablename__ = "users"
@@ -9,6 +9,8 @@ class DBUser(Base):
     username = Column(String)
     email = Column(String)
     password = Column(String)
+    is_verified = Column(Boolean, default=False)
+    role = Column(String)
 
 class JobCounter(Base):
     __tablename__ = "number_of_jobs"

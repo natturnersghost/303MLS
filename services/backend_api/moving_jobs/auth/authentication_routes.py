@@ -19,6 +19,7 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depe
     if not Hash.verify(user.password, request.password):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid Credentials')
 
+# token is necessary for authentication the information is encoded
     access_token = oauth2.create_access_token(data={"sub": user.username})
 
     return{

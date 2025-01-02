@@ -10,12 +10,14 @@ export default function NewUser() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'user'
   });
   const [errors, setErrors] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    role: ''
   });
 
   const validateField = (name: string, value: string) => {
@@ -45,7 +47,8 @@ export default function NewUser() {
     const newErrors = {
       username: validateField('username', formData.username),
       email: validateField('email', formData.email),
-      password: validateField('password', formData.password)
+      password: validateField('password', formData.password),
+      role: ''
     };
     
     setErrors(newErrors);
@@ -61,11 +64,15 @@ export default function NewUser() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          is_verified: false
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create user');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create user');
       }
 
       router.push('/'); // Redirect to home page after successful creation

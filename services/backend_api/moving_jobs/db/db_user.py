@@ -19,7 +19,9 @@ def create_user(db: Session, request: UserBase):
     new_user = DBUser(
         username = request.username,
         email = request.email,
-        password = Hash.bcrypt(request.password)
+        password = Hash.bcrypt(request.password),
+        is_verified = False,
+        role = "employee"
     )
     db.add(new_user) # -> adds a new user
     db.commit() # -> sends it to the database

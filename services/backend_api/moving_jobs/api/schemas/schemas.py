@@ -55,6 +55,8 @@ class UserBase(BaseModel):
     username: str
     email: EmailStr
     password: str
+    is_verified: bool = False
+    role: str
 
 class UserDisplay(BaseModel):
     username: str

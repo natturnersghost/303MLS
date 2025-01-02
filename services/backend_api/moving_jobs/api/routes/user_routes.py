@@ -56,6 +56,7 @@ async def sign_in(
 
 @router.post('/new_user', response_model=UserDisplay)
 def create_user(request: UserBase, db: Session = Depends(get_db)):
+    
     return db_user.create_user(db, request)
 
 @router.get('/all_users', response_model=List[UserDisplay])
