@@ -6,57 +6,59 @@ from db import db_user
 from api.schemas.schemas import UserBase, UserDisplay
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
+from auth.oauth2 import oauth2_scheme, get_current_user
 
 router = APIRouter(
     tags=['Users']
 )
 
-@router.post('/sign_in', include_in_schema=True)
-async def sign_in(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    try:
-        print(f"Received sign in request for user: {form_data.username}")
+# @router.post('/sign_in', include_in_schema=True)
+# async def sign_in(
+#     form_data: OAuth2PasswordRequestForm = Depends(),
+#     db: Session = Depends(get_db)
+# ):
+#     try:
+#         print(f"Received sign in request for user: {form_data.username}")
         
-        request = UserBase(
-            username=form_data.username,
-            password=form_data.password
-        )
+#         request = UserBase(
+#             username=form_data.username,
+#             password=form_data.password
+#         )
         
-        user = db_user.sign_in(db, request)
-        if not user:
-            return JSONResponse(
-                content={"detail": "Invalid credentials"},
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                media_type="application/json"
-            )
+#         user = db_user.sign_in(db, request)
+#         if not user:
+#             return JSONResponse(
+#                 content={"detail": "Invalid credentials"},
+#                 status_code=status.HTTP_401_UNAUTHORIZED,
+#                 media_type="application/json"
+#             )
         
-        response_data = {
-            "access_token": "your_token_here",
-            "token_type": "bearer",
-            "user_id": user.id,
-            "username": user.username
-        }
+#         response_data = {
+#             "access_token": "your_token_here",
+#             "token_type": "bearer",
+#             "user_id": user.id,
+#             "username": user.username
+#         }
         
-        print(f"Sending response: {response_data}")
+#         print(f"Sending response: {response_data}")
         
-        return JSONResponse(
-            content=response_data,
-            status_code=200,
-            media_type="application/json"
-        )
-    except Exception as e:
-        print(f"Error in sign_in: {str(e)}")
-        return JSONResponse(
-            content={"detail": str(e)},
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            media_type="application/json"
-        )
+#         return JSONResponse(
+#             content=response_data,
+#             status_code=200,
+#             media_type="application/json"
+#         )
+#     except Exception as e:
+#         print(f"Error in sign_in: {str(e)}")
+#         return JSONResponse(
+#             content={"detail": str(e)},
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             media_type="application/json"
+#         )
 
 @router.post('/new_user', response_model=UserDisplay)
-def create_user(request: UserBase, db: Session = Depends(get_db)):
-    
+def create_user(request: UserBase, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme), current_user: UserDisplay = Depends(get_current_user)):
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not authorized to create a user")
     return db_user.create_user(db, request)
 
 @router.get('/all_users', response_model=List[UserDisplay])
